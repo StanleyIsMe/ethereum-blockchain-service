@@ -1,0 +1,20 @@
+{
+    "apps": [
+        {
+            "name": "api",
+            "script": "go run main.go",
+            "cwd": "/go/src/github.com/ethereum-blockchain-service/cmd/api" ,
+            "exec_interpreter": "",
+            "exec_mode": "fork",
+            "autorestart": false,
+        },
+        {
+            "name": "indexer",
+            "script": "go run main.go",
+            "cwd": "/go/src/github.com/ethereum-blockchain-service/cmd/indexer" ,
+            "exec_interpreter": "",
+            "exec_mode": "fork",
+            "autorestart": false,
+        }
+    ]
+}

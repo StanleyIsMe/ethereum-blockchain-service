@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+  api:
+    image: api-inter
+    container_name: api
+    entrypoint: /api
+    build:
+      context: .
+      dockerfile: docker/dockerfile
+      args:
+        PACKAGE_PATH: "src/github.com/ethereum-blockchain-service"
+        ENTER_PATH: "cmd/api"
+        APP_NAME: "api"
+        EXPOSE_PORT: 8080
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
+    stdin_open: true
+    tty: true
+    stop_grace_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  indexer:
+    image: indexer
+    container_name: indexer
+    entrypoint: /indexer
+    build:
+      context: .
+      dockerfile: docker/dockerfile
+      args:
+        PACKAGE_PATH: "src/github.com/ethereum-blockchain-service"
+        ENTER_PATH: "cmd/indexer"
+        APP_NAME: "indexer"
+    stdin_open: true
+    depends_on:
+      - mysql
+#    tty: true
+    stop_grace_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_CHARSET=utf8
+      - MYSQL_DATABASE=ethdb
+
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_backup:/var/lib/mysql
+    tty: true

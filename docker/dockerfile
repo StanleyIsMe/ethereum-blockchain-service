@@ -1,0 +1,24 @@
+# build golang env
+FROM golang:1.15.15-alpine3.14 AS build-env
+RUN apk add --no-cache tzdata
+ARG PACKAGE_PATH
+ARG ENTER_PATH
+ARG APP_NAME
+ADD . ${GOPATH}/${PACKAGE_PATH}
+RUN cd ${GOPATH}/${PACKAGE_PATH}/${ENTER_PATH} \
+    && export GO111MODULE=on \
+    && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ${APP_NAME}
+
+# build image
+FROM alpine:3.14
+ARG PACKAGE_PATH
+ARG ENTER_PATH
+ARG APP_NAME
+ARG EXPOSE_PORT
+COPY --from=build-env /usr/share/zoneinfo /usr/share/zoneinfo
+# COPY --from=build-env /go/${PACKAGE_PATH}/${ENTER_PATH}/${CONFIG_PATH}/ /conf/
+COPY --from=build-env /go/${PACKAGE_PATH}/${ENTER_PATH}/${APP_NAME} /
+# EXPOSE ${EXPOSE_PORT}
+CMD ["/${APP_NAME}"]
+
+
